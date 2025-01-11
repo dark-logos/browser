@@ -13,29 +13,54 @@
 #include "network.h"
 #include "html_parser.h"
 #include "renderer.h"
+#include <QString>
+#include <map>
 
+/**
+ * @class BrowserWindow
+ * @brief Управляет графическим интерфейсом браузера с вкладками.
+ */
 class BrowserWindow : public QMainWindow {
   Q_OBJECT
 
 public:
   /**
-   * Constructs the browser window.
-   * @param parent The parent widget.
+   * Конструктор окна браузера.
+   * @param parent Родительский виджет.
    */
   explicit BrowserWindow(QWidget *parent = nullptr);
 
 private slots:
   /**
-   * Handles the action of opening a new tab with the specified URL.
+   * Открывает новую вкладку с указанным URL.
    */
   void openNewTab();
 
+  /**
+   * Обрабатывает переключение вкладок и восстанавливает замороженные вкладки.
+   * @param index Индекс активной вкладки.
+   */
+  void onTabChanged(int index);
+
 private:
-  QTabWidget *tabs_;          ///< Manages browser tabs.
-  QLineEdit *url_bar_;        ///< Input field for URLs.
-  Network network_;           ///< Network module for fetching pages.
-  HtmlParser parser_;         ///< HTML parser module.
-  Renderer renderer_;         ///< Renderer module.
+  /**
+   * Замораживает вкладку, сохраняя её состояние на диск.
+   * @param index Индекс вкладки.
+   */
+  void freezeTab(int index);
+
+  /**
+   * Размораживает вкладку, восстанавливая её состояние.
+   * @param index Индекс вкладки.
+   */
+  void unfreezeTab(int index);
+
+  QTabWidget *tabs_;          ///< Управляет вкладками браузера.
+  QLineEdit *url_bar_;        ///< Поле ввода URL.
+  Network network_;           ///< Модуль сети для загрузки страниц.
+  HtmlParser parser_;         ///< Модуль парсинга HTML.
+  Renderer renderer_;         ///< Модуль рендеринга.
+  std::map<int, QString> frozen_tabs_; ///< Хранит URL замороженных вкладок.
 };
 
-#endif 
+#endif  // BROWSER_WINDOW_H

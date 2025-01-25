@@ -1,8 +1,6 @@
 /**
  * @file browser_window.h
- * @brief Declaration of the BrowserWindow class, managing the browser's GUI.
- * @version 1.0
- * @author dark-logos
+ * @brief Defines browser GUI with tab management.
  */
 #ifndef BROWSER_WINDOW_H
 #define BROWSER_WINDOW_H
@@ -10,32 +8,58 @@
 #include <QMainWindow>
 #include <QTabWidget>
 #include <QLineEdit>
+#include <QScrollArea>
 #include "network.h"
 #include "html_parser.h"
 #include "renderer.h"
+#include <QString>
+#include <map>
 
+/**
+ * @class BrowserWindow
+ * @brief Manages browser GUI with tabs and content rendering.
+ */
 class BrowserWindow : public QMainWindow {
   Q_OBJECT
 
 public:
   /**
-   * Constructs the browser window.
-   * @param parent The parent widget.
+   * @brief Constructs browser window.
+   * @param parent Parent widget.
    */
   explicit BrowserWindow(QWidget *parent = nullptr);
 
 private slots:
   /**
-   * Handles the action of opening a new tab with the specified URL.
+   * @brief Opens a new tab with the entered URL.
    */
   void openNewTab();
 
+  /**
+   * @brief Handles tab switching and frozen tab restoration.
+   * @param index Index of the active tab.
+   */
+  void onTabChanged(int index);
+
 private:
-  QTabWidget *tabs_;          ///< Manages browser tabs.
-  QLineEdit *url_bar_;        ///< Input field for URLs.
-  Network network_;           ///< Network module for fetching pages.
-  HtmlParser parser_;         ///< HTML parser module.
-  Renderer renderer_;         ///< Renderer module.
+  /**
+   * @brief Freezes a tab, saving its state to disk.
+   * @param index Tab index.
+   */
+  void freezeTab(int index);
+
+  /**
+   * @brief Restores a frozen tab.
+   * @param index Tab index.
+   */
+  void unfreezeTab(int index);
+
+  QTabWidget *tabs_;
+  QLineEdit *url_bar_;
+  Network network_;
+  HtmlParser parser_;
+  Renderer renderer_;
+  std::map<int, QString> frozen_tabs_;
 };
 
-#endif 
+#endif

@@ -1,33 +1,31 @@
 /**
  * @file network.h
- * @brief Declaration of the Network class for HTTP requests.
- * @version 1.0
- * @author dark-logos
+ * @brief Defines network module for fetching web content and media.
  */
 #ifndef NETWORK_H
 #define NETWORK_H
 
 #include <string>
 
+/**
+ * @class Network
+ * @brief Fetches web pages and media files.
+ */
 class Network {
 public:
   /**
-   * Fetches the content of a web page from the given URL.
-   * @param url The URL of the web page to fetch.
-   * @return The HTML content as a string.
+   * @brief Fetches HTML content from a URL.
+   * @param url Web page URL.
+   * @return HTML content as a string.
    */
   std::string fetch(const std::string& url);
 
-private:
   /**
-   * Callback function for libcurl to handle received data.
-   * @param contents Pointer to the received data.
-   * @param size Size of each data element.
-   * @param nmemb Number of data elements.
-   * @param data Pointer to the string to store the data.
-   * @return The total size of processed data.
+   * @brief Fetches and caches a media file.
+   * @param url Media file URL.
+   * @return Path to the cached file.
    */
-  static size_t writeCallback(void* contents, size_t size, size_t nmemb, std::string* data);
+  std::string fetchMedia(const std::string& url);
 };
 
-#endif  
+#endif

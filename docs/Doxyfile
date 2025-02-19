@@ -1,0 +1,16 @@
+# Doxyfile for QuickDOM project
+
+PROJECT_NAME           = "QuickDOM"
+PROJECT_BRIEF          = "Mini browser with media support and SIMD parsing"
+OUTPUT_DIRECTORY       = docs
+CREATE_SUBDIRS        = YES
+INPUT                  = /Users/valeriy/browser/src
+FILE_PATTERNS          = *.h *.cpp
+RECURSIVE              = YES
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+GENERATE_LATEX         = NO
+OPTIMIZE_OUTPUT_FOR_C  = YES
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES

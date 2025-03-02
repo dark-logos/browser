@@ -14,29 +14,60 @@
 // Parse tag attributes (e.g., src="image.jpg")
 std::map<std::string, std::string> extractAttributes(const std::string& tag) {
   std::map<std::string, std::string> attributes;
-  std::istringstream iss(tag);
+  size_t pos = 1; // skip <
   std::string key, value;
-  char c;
 
-  iss >> c; // skip <
-  while (iss >> c && c != ' ' && c != '>') {}
+  // Skip tag name
+  while (pos < tag.size() && tag[pos] != ' ' && tag[pos] != '>') pos++;
+  while (pos < tag.size() && tag[pos] == ' ') pos++;
 
-  while (iss >> key) {
-    if (key == ">") break;
-    if (iss.peek() == '=') {
-      iss >> c; // skip =
-      iss >> c; // value start
-      value.clear();
-      if (c == '"') {
-        while (iss >> c && c != '"') value += c;
-      } else {
-        value += c;
-        while (iss >> c && c != ' ' && c != '>') value += c;
-      }
+  // Extract attributes
+  while (pos < tag.size() && tag[pos] != '>') {
+    key.clear();
+    value.clear();
+
+    // Read key
+    while (pos < tag.size() && tag[pos] != '=' && tag[pos] != ' ' && tag[pos] != '>') {
+      key += tag[pos++];
+    }
+    while (pos < tag.size() && tag[pos] == ' ') pos++;
+    if (pos >= tag.size() || tag[pos] != '=') continue;
+    pos++; // skip =
+    while (pos < tag.size() && tag[pos] == ' ') pos++;
+
+    // Read value
+    bool quoted = false;
+    if (pos < tag.size() && tag[pos] == '"') {
+      quoted = true;
+      pos++;
+    }
+    while (pos < tag.size() && ((quoted && tag[pos] != '"') || (!quoted && tag[pos] != ' ' && tag[pos] != '>'))) {
+      value += tag[pos++];
+    }
+    if (quoted && pos < tag.size() && tag[pos] == '"') pos++;
+    if (!key.empty()) {
       attributes[key] = value;
     }
+    while (pos < tag.size() && tag[pos] == ' ') pos++;
+  }
+
+  // Debug full tag
+  std::cout << "Parsed tag: " << tag << "\n";
+  for (const auto& attr : attributes) {
+    std::cout << "Attr: " << attr.first << "=\"" << attr.second << "\"\n";
   }
   return attributes;
+}
+
+std::string stripHtmlTags(const std::string& text) {
+  std::string result;
+  bool in_tag = false;
+  for (char c : text) {
+    if (c == '<') in_tag = true;
+    else if (c == '>') in_tag = false;
+    else if (!in_tag) result += c;
+  }
+  return result;
 }
 
 Node ScalarParser::parse(const std::string& html) {
@@ -52,7 +83,7 @@ Node ScalarParser::parse(const std::string& html) {
       if (end == std::string::npos) break;
       Node child;
       child.type = "text";
-      child.text = html.substr(tag_start + 3, end - tag_start - 3);
+      child.text = stripHtmlTags(html.substr(tag_start + 3, end - tag_start - 3));
       root.children.push_back(child);
       std::cout << "Scalar: found <p> at " << tag_start << ", text: " << child.text << "\n";
       pos = end + 4;
@@ -95,7 +126,7 @@ Node SimdParser::parse(const std::string& html) {
         if (end == std::string::npos) break;
         Node child;
         child.type = "text";
-        child.text = html.substr(tag_pos + 3, end - tag_pos - 3);
+        child.text = stripHtmlTags(html.substr(tag_pos + 3, end - tag_pos - 3));
         root.children.push_back(child);
         std::cout << "SIMD: found <p> at " << tag_pos << ", text: " << child.text << "\n";
       } else if (tag_pos + 4 < len && data[tag_pos + 1] == 'i' && data[tag_pos + 2] == 'm' && data[tag_pos + 3] == 'g') {
@@ -117,7 +148,7 @@ Node SimdParser::parse(const std::string& html) {
       if (end == std::string::npos) break;
       Node child;
       child.type = "text";
-      child.text = html.substr(pos + 3, end - pos - 3);
+      child.text = stripHtmlTags(html.substr(pos + 3, end - pos - 3));
       root.children.push_back(child);
       std::cout << "Scalar remainder: found <p> at " << pos << ", text: " << child.text << "\n";
       pos = end + 4;
@@ -163,7 +194,7 @@ Node NeonParser::parse(const std::string& html) {
           if (end == std::string::npos) continue;
           Node child;
           child.type = "text";
-          child.text = html.substr(tag_pos + 3, end - tag_pos - 3);
+          child.text = stripHtmlTags(html.substr(tag_pos + 3, end - tag_pos - 3));
           root.children.push_back(child);
           std::cout << "NEON: found <p> at " << tag_pos << ", text: " << child.text << "\n";
         } else if (data[tag_pos + 1] == 'i' && data[tag_pos + 2] == 'm' && data[tag_pos + 3] == 'g') {
@@ -185,7 +216,7 @@ Node NeonParser::parse(const std::string& html) {
       if (end == std::string::npos) break;
       Node child;
       child.type = "text";
-      child.text = html.substr(pos + 3, end - pos - 3);
+      child.text = stripHtmlTags(html.substr(pos + 3, end - pos - 3));
       root.children.push_back(child);
       std::cout << "Scalar remainder: found <p> at " << pos << ", text: " << child.text << "\n";
       pos = end + 4;

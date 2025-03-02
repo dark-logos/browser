@@ -86,4 +86,11 @@ private:
   ParserStrategy* strategy_;
 };
 
+/**
+ * @brief Removes HTML tags from text.
+ * @param text Input text with HTML tags.
+ * @return Text without HTML tags.
+ */
+std::string stripHtmlTags(const std::string& text);
+
 #endif

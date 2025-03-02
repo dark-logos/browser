@@ -10,6 +10,21 @@
 #include <QFile>
 #include <QTextStream>
 
+// Convert relative URL to absolute
+std::string makeAbsoluteUrl(const std::string& base_url, const std::string& relative_url) {
+  if (relative_url.empty()) return "";
+  if (relative_url.find("http://") == 0 || relative_url.find("https://") == 0) {
+    return relative_url;
+  }
+  std::string base = base_url;
+  if (base.back() != '/') base += '/';
+  if (relative_url.front() == '/') {
+    size_t pos = base.find('/', 8); // skip http:// or https://
+    if (pos != std::string::npos) base = base.substr(0, pos);
+  }
+  return base + relative_url;
+}
+
 BrowserWindow::BrowserWindow(QWidget *parent)
     : QMainWindow(parent),
       parser_(
@@ -21,23 +36,21 @@ BrowserWindow::BrowserWindow(QWidget *parent)
           new ScalarParser()
 #endif
       ) {
-  QFont font("Arial", 10);
+  QFont font("Palatino", 10); // Fallback for Palatino Linotype
   QApplication::setFont(font);
 
   auto* central_widget = new QWidget(this);
   setCentralWidget(central_widget);
   auto* layout = new QVBoxLayout(central_widget);
 
-  // Поле для URL
   url_bar_ = new QLineEdit(this);
-  url_bar_ ->setPlaceholderText("Enter URL (e.g., http://example.com)");
+  url_bar_->setPlaceholderText("Enter URL (e.g., http://example.com)");
   layout->addWidget(url_bar_);
 
   auto* open_button = new QPushButton("Open Tab", this);
   connect(open_button, &QPushButton::clicked, this, &BrowserWindow::openNewTab);
   layout->addWidget(open_button);
 
-  // Вкладки
   tabs_ = new QTabWidget(this);
   layout->addWidget(tabs_);
   connect(tabs_, &QTabWidget::currentChanged, this, &BrowserWindow::onTabChanged);
@@ -47,7 +60,6 @@ BrowserWindow::BrowserWindow(QWidget *parent)
 }
 
 void BrowserWindow::openNewTab() {
-  // Загрузка и парсинг страницы
   std::string url = url_bar_->text().toStdString();
   std::string html = network_.fetch(url);
   Node root = parser_.parse(html);
@@ -57,6 +69,7 @@ void BrowserWindow::openNewTab() {
     if (child.type == "image") {
       auto src_it = child.attributes.find("src");
       if (src_it != child.attributes.end()) {
+        src_it->second = makeAbsoluteUrl(url, src_it->second);
         std::string media_path = network_.fetchMedia(src_it->second);
         if (!media_path.empty()) {
           child.attributes["src"] = media_path;
@@ -92,6 +105,7 @@ void BrowserWindow::onTabChanged(int index) {
 void BrowserWindow::freezeTab(int index) {
   auto* scroll_area = qobject_cast<QScrollArea*>(tabs_->widget(index));
   if (!scroll_area) return;
+
   QString url = frozen_tabs_[index];
   QFile file(QString("tab_%1.html").arg(index));
   if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -99,6 +113,7 @@ void BrowserWindow::freezeTab(int index) {
     out << url;
     file.close();
   }
+
   tabs_->removeTab(index);
   tabs_->insertTab(index, new QWidget(), url);
 }
@@ -113,6 +128,7 @@ void BrowserWindow::unfreezeTab(int index) {
     if (child.type == "image") {
       auto src_it = child.attributes.find("src");
       if (src_it != child.attributes.end()) {
+        src_it->second = makeAbsoluteUrl(url.toStdString(), src_it->second);
         std::string media_path = network_.fetchMedia(src_it->second);
         if (!media_path.empty()) {
           child.attributes["src"] = media_path;

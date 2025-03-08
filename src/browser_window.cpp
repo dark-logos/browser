@@ -10,21 +10,6 @@
 #include <QFile>
 #include <QTextStream>
 
-// Convert relative URL to absolute
-std::string makeAbsoluteUrl(const std::string& base_url, const std::string& relative_url) {
-  if (relative_url.empty()) return "";
-  if (relative_url.find("http://") == 0 || relative_url.find("https://") == 0) {
-    return relative_url;
-  }
-  std::string base = base_url;
-  if (base.back() != '/') base += '/';
-  if (relative_url.front() == '/') {
-    size_t pos = base.find('/', 8); // skip http:// or https://
-    if (pos != std::string::npos) base = base.substr(0, pos);
-  }
-  return base + relative_url;
-}
-
 BrowserWindow::BrowserWindow(QWidget *parent)
     : QMainWindow(parent),
       parser_(
@@ -36,7 +21,7 @@ BrowserWindow::BrowserWindow(QWidget *parent)
           new ScalarParser()
 #endif
       ) {
-  QFont font("Palatino", 10); // Fallback for Palatino Linotype
+  QFont font("Arial", 10);
   QApplication::setFont(font);
 
   auto* central_widget = new QWidget(this);
@@ -69,8 +54,7 @@ void BrowserWindow::openNewTab() {
     if (child.type == "image") {
       auto src_it = child.attributes.find("src");
       if (src_it != child.attributes.end()) {
-        src_it->second = makeAbsoluteUrl(url, src_it->second);
-        std::string media_path = network_.fetchMedia(src_it->second);
+        std::string media_path = network_.fetchMedia(src_it->second, url);
         if (!media_path.empty()) {
           child.attributes["src"] = media_path;
         }
@@ -128,8 +112,7 @@ void BrowserWindow::unfreezeTab(int index) {
     if (child.type == "image") {
       auto src_it = child.attributes.find("src");
       if (src_it != child.attributes.end()) {
-        src_it->second = makeAbsoluteUrl(url.toStdString(), src_it->second);
-        std::string media_path = network_.fetchMedia(src_it->second);
+        std::string media_path = network_.fetchMedia(src_it->second, url.toStdString());
         if (!media_path.empty()) {
           child.attributes["src"] = media_path;
         }

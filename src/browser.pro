@@ -1,8 +1,21 @@
-# Qt project file
-QT += core gui widgets
+QT += core gui widgets svg
+CONFIG += c++17
+
 TARGET = QuickDOM
 TEMPLATE = app
-SOURCES += main.cpp browser_window.cpp network.cpp html_parser.cpp renderer.cpp
-HEADERS += browser_window.h network.h html_parser.h renderer.h
-LIBS += -lcurl
-CONFIG += c++20
+
+SOURCES += \
+    main.cpp \
+    browser_window.cpp \
+    html_parser.cpp \
+    network.cpp \
+    renderer.cpp
+
+HEADERS += \
+    browser_window.h \
+    html_parser.h \
+    network.h \
+    renderer.h
+
+INCLUDEPATH += /opt/homebrew/include
+LIBS += -L/opt/homebrew/lib -lcurl

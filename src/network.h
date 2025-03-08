@@ -23,9 +23,10 @@ public:
   /**
    * @brief Fetches and caches a media file.
    * @param url Media file URL.
+   * @param base_url Base URL for resolving relative paths.
    * @return Path to the cached file.
    */
-  std::string fetchMedia(const std::string& url);
+  std::string fetchMedia(const std::string& url, const std::string& base_url);
 };
 
 #endif

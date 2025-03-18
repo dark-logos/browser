@@ -49,4 +49,18 @@ for file in tab_*.html; do
     fi
 done
 
+for file in moc_*; do
+    if [ -f "$file" ]; then
+        rm "$file"
+        echo "Removed $file"
+    fi
+done
+
+for file in *.o; do
+    if [ -f "$file" ]; then
+        rm "$file"
+        echo "Removed $file"
+    fi
+done
+
 echo "Cleanup complete!"

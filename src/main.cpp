@@ -1,15 +1,13 @@
 /**
  * @file main.cpp
- * @brief Entry point for the mini-browser application.
- * @version 1.0
- * @author dark-logos
+ * @brief Entry point for QuickDOM browser.
  */
-#include "browser_window.h"
 #include <QApplication>
+#include "browser_window.h"
 
 int main(int argc, char *argv[]) {
-  QApplication app(argc, argv);
-  BrowserWindow window;
-  window.show();
-  return app.exec();
+    QApplication app(argc, argv);
+    BrowserWindow window;
+    window.show();
+    return app.exec();
 }

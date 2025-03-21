@@ -1,26 +1,25 @@
 /**
  * @file renderer.h
- * @brief Defines renderer for DOM to Qt widgets.
+ * @brief Defines renderer for DOM nodes.
  */
 #ifndef RENDERER_H
 #define RENDERER_H
 
 #include "html_parser.h"
-#include <QWidget>
 #include <QVBoxLayout>
 
 /**
  * @class Renderer
- * @brief Renders DOM tree into Qt widgets.
+ * @brief Renders DOM nodes into Qt widgets.
  */
 class Renderer {
 public:
-  /**
-   * @brief Renders DOM tree into a layout.
-   * @param node DOM tree root node.
-   * @param layout Qt layout to populate.
-   */
-  void render(const Node& node, QVBoxLayout* layout);
+    /**
+     * @brief Renders a DOM node into a layout.
+     * @param node DOM node to render.
+     * @param layout Target layout.
+     */
+    void render(const Node& node, QVBoxLayout* layout);
 };
 
 #endif

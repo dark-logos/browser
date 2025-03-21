@@ -1,96 +1,60 @@
 /**
  * @file html_parser.h
- * @brief Defines HTML parser and DOM node structure.
+ * @brief Defines HTML parsing interface and DOM structure.
  */
 #ifndef HTML_PARSER_H
 #define HTML_PARSER_H
 
 #include <string>
-#include <vector>
 #include <map>
+#include <vector>
 
 /**
- * @struct Node
- * @brief Represents a DOM tree node.
+ * @brief Represents a DOM node.
  */
 struct Node {
-  std::string type;  // text, image, video, audio
-  std::string text;  // content for text nodes
-  std::map<std::string, std::string> attributes;  // e.g., src, alt
-  std::vector<Node> children;
+    std::string type; // e.g., "text", "image", "link", "header", "div"
+    std::string text; // Text content for text nodes or link text
+    std::map<std::string, std::string> attributes; // Tag attributes
+    std::vector<Node> children; // Child nodes
 };
 
 /**
- * @class ParserStrategy
- * @brief Abstract base for HTML parsing strategies.
- */
-class ParserStrategy {
-public:
-  virtual ~ParserStrategy() = default;
-  /**
-   * @brief Parses HTML into a DOM tree.
-   * @param html HTML content to parse.
-   * @return Root node of the DOM tree.
-   */
-  virtual Node parse(const std::string& html) = 0;
-};
-
-/**
- * @class ScalarParser
- * @brief Scalar HTML parsing implementation.
- */
-class ScalarParser : public ParserStrategy {
-public:
-  Node parse(const std::string& html) override;
-};
-
-#if defined(__x86_64__) || defined(__i386__)
-/**
- * @class SimdParser
- * @brief SSE4.2-accelerated HTML parsing for x86/x64.
- */
-class SimdParser : public ParserStrategy {
-public:
-  Node parse(const std::string& html) override;
-};
-#elif defined(__arm64__)
-/**
- * @class NeonParser
- * @brief NEON-accelerated HTML parsing for ARM.
- */
-class NeonParser : public ParserStrategy {
-public:
-  Node parse(const std::string& html) override;
-};
-#endif
-
-/**
- * @class HtmlParser
- * @brief Parses HTML using a specified strategy.
+ * @brief Interface for HTML parsers.
  */
 class HtmlParser {
 public:
-  /**
-   * @brief Constructs parser with a strategy.
-   * @param strategy Parsing strategy (e.g., ScalarParser, NeonParser).
-   */
-  explicit HtmlParser(ParserStrategy* strategy) : strategy_(strategy) {}
-  /**
-   * @brief Parses HTML into a DOM tree.
-   * @param html HTML content to parse.
-   * @return Root node of the DOM tree.
-   */
-  Node parse(const std::string& html) { return strategy_->parse(html); }
-
-private:
-  ParserStrategy* strategy_;
+    virtual ~HtmlParser() = default;
+    /**
+     * @brief Parses HTML into a DOM tree.
+     * @param html HTML content.
+     * @return Root node of the DOM tree.
+     */
+    virtual Node parse(const std::string& html) = 0;
 };
 
 /**
- * @brief Removes HTML tags from text.
- * @param text Input text with HTML tags.
- * @return Text without HTML tags.
+ * @brief Scalar HTML parser implementation.
  */
-std::string stripHtmlTags(const std::string& text);
+class ScalarParser : public HtmlParser {
+public:
+    Node parse(const std::string& html) override;
+};
 
-#endif
+/**
+ * @brief SIMD-accelerated HTML parser for x86.
+ */
+class SimdParser : public HtmlParser {
+public:
+    Node parse(const std::string& html) override;
+};
+
+/**
+ * @brief NEON-accelerated HTML parser for ARM.
+ */
+class NeonParser : public HtmlParser {
+public:
+    Node parse(const std::string& html) override;
+};
+
+#endif // HTML_PARSER_H

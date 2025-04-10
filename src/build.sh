@@ -7,7 +7,7 @@ set -e
 
 # Paths
 QMAKE=/opt/homebrew/bin/qmake
-EXECUTABLE=QuickDOM.app/Contents/MacOS/QuickDOM
+EXECUTABLE=build/QuickDOM.app/Contents/MacOS/QuickDOM
 
 echo "Starting build process for QuickDOM..."
 

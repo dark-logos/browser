@@ -7,7 +7,7 @@ set -e
 
 # Paths
 CERT_PEM=/opt/homebrew/etc/openssl@3/cert.pem
-EXECUTABLE=QuickDOM.app/Contents/MacOS/QuickDOM
+EXECUTABLE=build/QuickDOM.app/Contents/MacOS/QuickDOM
 
 # Check if executable exists
 if [ ! -f "$EXECUTABLE" ]; then

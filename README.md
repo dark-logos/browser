@@ -2,6 +2,11 @@
 
 A simple web browser built with C++ and Qt, featuring HTML parsing, rendering, and network capabilities. This project includes a comprehensive test suite using Google Test and Google Mock.
 
+Rendering text and pictures from [https](https://www.nature.com/)
+![demo](docs/gifs/demo.gif)
+
+Navigating to a link from the page 
+![demo](docs/gifs/demo_link.gif)
 ## Prerequisites
 
 - macOS (tested on macOS Ventura 13.0+)

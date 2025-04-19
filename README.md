@@ -22,10 +22,8 @@ Navigating to a link from the page
 ## Setup Instructions
 
 1. **Clone the repository**:
-   ```bash
    git clone https://github.com/yourusername/QuickDOM.git
    cd browser/src
-   ```
 
 2. **Run the setup script**:
    chmod +x setup.sh
@@ -43,6 +41,5 @@ Navigating to a link from the page
 5. **Run tests**:
     chmod +x run_tests.sh
    ./run_tests.sh
-   ```
 
    This runs 55 unit tests covering HTML parsing, network, rendering, browser window, and link label functionality.

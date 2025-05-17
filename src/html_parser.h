@@ -12,26 +12,79 @@
 
 /**
  * @struct Node
- * @brief Represents a node in the DOM tree.
+ * @brief Представляет узел в дереве DOM.
  */
 struct Node {
-  std::string tag;              ///< The tag name (e.g., "text", "p").
-  std::string text;             ///< The text content of the node.
-  std::vector<Node> children;   ///< Child nodes in the DOM tree.
+  std::string tag;              ///< Имя тега (например, "text", "p").
+  std::string text;             ///< Текстовое содержимое узла.
+  std::vector<Node> children;   ///< Дочерние узлы в дереве DOM.
 };
 
 /**
+ * @class ParserStrategy
+ * @brief Абстрактный базовый класс для стратегий парсинга HTML.
+ */
+class ParserStrategy {
+public:
+  virtual ~ParserStrategy() = default;
+  /**
+   * Парсит HTML-контент в дерево DOM.
+   * @param html HTML-контент для парсинга.
+   * @return Корневой узел дерева DOM.
+   */
+  virtual Node parse(const std::string& html) = 0;
+};
+
+/**
+ * @class ScalarParser
+ * @brief Скалярная реализация парсинга HTML.
+ */
+class ScalarParser : public ParserStrategy {
+public:
+  Node parse(const std::string& html) override;
+};
+
+#if defined(__x86_64__) || defined(__i386__)
+/**
+ * @class SimdParser
+ * @brief SSE4.2-ускоренная реализация парсинга HTML для x86/x64.
+ */
+class SimdParser : public ParserStrategy {
+public:
+  Node parse(const std::string& html) override;
+};
+#elif defined(__arm64__)
+/**
+ * @class NeonParser
+ * @brief NEON-ускоренная реализация парсинга HTML для ARM.
+ */
+class NeonParser : public ParserStrategy {
+public:
+  Node parse(const std::string& html) override;
+};
+#endif
+
+/**
  * @class HtmlParser
- * @brief Parses HTML content into a DOM tree.
+ * @brief Парсит HTML-контент в дерево DOM с использованием указанной стратегии.
  */
 class HtmlParser {
 public:
   /**
-   * Parses HTML content into a DOM tree.
-   * @param html The HTML content to parse.
-   * @return The root node of the DOM tree.
+   * Конструктор HtmlParser с указанной стратегией парсинга.
+   * @param strategy Указатель на стратегию парсинга (например, ScalarParser, SimdParser или NeonParser).
    */
-  Node parse(const std::string& html);
+  explicit HtmlParser(ParserStrategy* strategy) : strategy_(strategy) {}
+
+  /**
+   * Парсит HTML-контент в дерево DOM.
+   * @param html HTML-контент для парсинга.
+   * @return Корневой узел дерева DOM.
+   */
+  Node parse(const std::string& html) { return strategy_->parse(html); }
+
+private:
+  ParserStrategy* strategy_;  ///< Стратегия парсинга.
 };
 
-#endif  
+#endif  // HTML_PARSER_H

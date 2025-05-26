@@ -28,6 +28,7 @@ BrowserWindow::BrowserWindow(QWidget *parent)
   setCentralWidget(central_widget);
   auto* layout = new QVBoxLayout(central_widget);
 
+  // Поле для URL
   url_bar_ = new QLineEdit(this);
   url_bar_ ->setPlaceholderText("Enter URL (e.g., http://example.com)");
   layout->addWidget(url_bar_);
@@ -36,6 +37,7 @@ BrowserWindow::BrowserWindow(QWidget *parent)
   connect(open_button, &QPushButton::clicked, this, &BrowserWindow::openNewTab);
   layout->addWidget(open_button);
 
+  // Вкладки
   tabs_ = new QTabWidget(this);
   layout->addWidget(tabs_);
   connect(tabs_, &QTabWidget::currentChanged, this, &BrowserWindow::onTabChanged);
@@ -45,6 +47,7 @@ BrowserWindow::BrowserWindow(QWidget *parent)
 }
 
 void BrowserWindow::openNewTab() {
+  // Загрузка и парсинг страницы
   std::string url = url_bar_->text().toStdString();
   std::string html = network_.fetch(url);
   Node root = parser_.parse(html);
@@ -89,7 +92,6 @@ void BrowserWindow::onTabChanged(int index) {
 void BrowserWindow::freezeTab(int index) {
   auto* scroll_area = qobject_cast<QScrollArea*>(tabs_->widget(index));
   if (!scroll_area) return;
-
   QString url = frozen_tabs_[index];
   QFile file(QString("tab_%1.html").arg(index));
   if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -97,7 +99,6 @@ void BrowserWindow::freezeTab(int index) {
     out << url;
     file.close();
   }
-
   tabs_->removeTab(index);
   tabs_->insertTab(index, new QWidget(), url);
 }

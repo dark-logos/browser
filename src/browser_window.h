@@ -1,8 +1,6 @@
 /**
  * @file browser_window.h
- * @brief Declaration of the BrowserWindow class, managing the browser's GUI.
- * @version 1.0
- * @author dark-logos
+ * @brief Defines browser GUI with tab management.
  */
 #ifndef BROWSER_WINDOW_H
 #define BROWSER_WINDOW_H
@@ -10,6 +8,7 @@
 #include <QMainWindow>
 #include <QTabWidget>
 #include <QLineEdit>
+#include <QScrollArea>
 #include "network.h"
 #include "html_parser.h"
 #include "renderer.h"
@@ -18,49 +17,49 @@
 
 /**
  * @class BrowserWindow
- * @brief Управляет графическим интерфейсом браузера с вкладками.
+ * @brief Manages browser GUI with tabs and content rendering.
  */
 class BrowserWindow : public QMainWindow {
   Q_OBJECT
 
 public:
   /**
-   * Конструктор окна браузера.
-   * @param parent Родительский виджет.
+   * @brief Constructs browser window.
+   * @param parent Parent widget.
    */
   explicit BrowserWindow(QWidget *parent = nullptr);
 
 private slots:
   /**
-   * Открывает новую вкладку с указанным URL.
+   * @brief Opens a new tab with the entered URL.
    */
   void openNewTab();
 
   /**
-   * Обрабатывает переключение вкладок и восстанавливает замороженные вкладки.
-   * @param index Индекс активной вкладки.
+   * @brief Handles tab switching and frozen tab restoration.
+   * @param index Index of the active tab.
    */
   void onTabChanged(int index);
 
 private:
   /**
-   * Замораживает вкладку, сохраняя её состояние на диск.
-   * @param index Индекс вкладки.
+   * @brief Freezes a tab, saving its state to disk.
+   * @param index Tab index.
    */
   void freezeTab(int index);
 
   /**
-   * Размораживает вкладку, восстанавливая её состояние.
-   * @param index Индекс вкладки.
+   * @brief Restores a frozen tab.
+   * @param index Tab index.
    */
   void unfreezeTab(int index);
 
-  QTabWidget *tabs_;          ///< Управляет вкладками браузера.
-  QLineEdit *url_bar_;        ///< Поле ввода URL.
-  Network network_;           ///< Модуль сети для загрузки страниц.
-  HtmlParser parser_;         ///< Модуль парсинга HTML.
-  Renderer renderer_;         ///< Модуль рендеринга.
-  std::map<int, QString> frozen_tabs_; ///< Хранит URL замороженных вкладок.
+  QTabWidget *tabs_;
+  QLineEdit *url_bar_;
+  Network network_;
+  HtmlParser parser_;
+  Renderer renderer_;
+  std::map<int, QString> frozen_tabs_;
 };
 
-#endif  // BROWSER_WINDOW_H
+#endif
